@@ -436,7 +436,13 @@ function _os2web_acadre_esdh_mm_order_addenums($drush = FALSE) {
       $node = $nodes[$next];
       if ($primary) {
         $addenum_to = field_get_items('node', $node, 'field_os2web_meetings_addendum');
-        $addenum_to = is_array($addenum_to) ? array_shift(array_shift($addenum_to)) : FALSE;
+        if (is_array($addenum_to)) {
+          $shifted_once = array_shift($addenum_to);
+          $addenum_to = array_shift($shifted_once);
+        }
+        else {
+          $addenum_to = FALSE;
+        }
         // Save time by only updating what is needed.
         if ($addenum_to != $primary->nid) {
           // error_log(basename(__FILE__) . ':' . __LINE__ . ' Var: $primary = ' . print_r($primary->nid, 1));
