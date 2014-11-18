@@ -5,10 +5,8 @@
  * This module implements Acadre ESDH backend for use in os2web
  */
 
-include_once('os2web_acadre_esdh.features.inc');
-
 define('ACADRE_MM_IMPORT_DIR', 'public://acadre');
-define('ACADRE_MM_DEFAULT_APPROVED', '62,59,64,53,54,56,57,63,58,51,55,61,68,69,42');
+define('ACADRE_MM_DEFAULT_APPROVED', '1,2,3,4,5');
 
 /**
  * Implements hook_ctools_plugin_directory().
@@ -47,6 +45,12 @@ function os2web_acadre_esdh_form_os2web_settings_settings_form_alter(&$form, &$f
     '#maxlength' => 200,
     '#description' => 'Komma sepereret liste over udvalgs-id der er godkendt til publisering.',
     '#default_value' => variable_get('os2web_meetings_approved_committee', ACADRE_MM_DEFAULT_APPROVED),
+  );
+  $form['meetings']['os2web_meetings_import_closed_agenda'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Import closed agenda'),
+    '#description'=>t('This decides if closed agenda is or is not to be imported'),
+    '#default_value' => variable_get('os2web_meetings_import_closed_agenda', false),
   );
 
   // CM Configuration.
