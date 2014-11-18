@@ -108,11 +108,13 @@ function os2web_acadre_esdh_mm_import_meeting($meeting) {
           'type' => (int) array_shift($xml_item->xpath('field/@type')),
         );
 
-        if ($agendainfo['publish'] === 1 && 
-            ($agendainfo['access'] !== 'Lukket' ||
-              ($agendainfo['access'] === 'Lukket' &&
-              variable_get('os2web_meetings_import_closed_agenda', false))) &&
-            $agendainfo['filesfolder'] != '') {
+        $is_agenda_published = ($agendainfo['publish'] === 1);
+        $is_agenda_not_closed = ($agendainfo['access'] !== 'Lukket');
+        $import_closed_agenda = ($agendainfo['access'] === 'Lukket' && variable_get('os2web_meetings_import_closed_agenda', false))
+        $is_folder_present = ($agendainfo['filesfolder'] != '');
+
+        if ($is_agenda_published && $is_folder_present && 
+          ($is_agenda_not_closed || $import_closed_agend)) {
           $agenda_uri = implode('/', array(
             variable_get('os2web_meetings_path', ACADRE_MM_IMPORT_DIR),
             $agendainfo['filesfolder'],
