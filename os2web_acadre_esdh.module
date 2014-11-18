@@ -25,6 +25,7 @@ function os2web_acadre_esdh_ctools_plugin_directory($module, $plugin) {
  * Add configuration to the settings form.
  */
 function os2web_acadre_esdh_form_os2web_settings_settings_form_alter(&$form, &$form_state) {
+
   // MM configuration.
   $form['meetings'] = array(
     '#type' => 'fieldset',
@@ -88,6 +89,7 @@ function os2web_acadre_esdh_form_os2web_settings_settings_form_alter(&$form, &$f
     '#title' => t('PWS password'),
     '#description' => t('PWS HTTP authentification password.'),
   );
+
   // Proxy setups
   $form['os2web_pws_proxy_group'] = array(
     '#type' => 'fieldset',
