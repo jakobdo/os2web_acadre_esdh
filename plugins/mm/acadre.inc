@@ -110,7 +110,7 @@ function os2web_acadre_esdh_mm_import_meeting($meeting) {
 
         $is_agenda_published = ($agendainfo['publish'] === 1);
         $is_agenda_not_closed = ($agendainfo['access'] !== 'Lukket');
-        $import_closed_agenda = ($agendainfo['access'] === 'Lukket' && variable_get('os2web_meetings_import_closed_agenda', false))
+        $import_closed_agenda = ($agendainfo['access'] === 'Lukket' && variable_get('os2web_meetings_import_closed_agenda', false));
         $is_folder_present = ($agendainfo['filesfolder'] != '');
 
         if ($is_agenda_published && $is_folder_present && 
