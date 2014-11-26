@@ -29,22 +29,22 @@ function os2web_acadre_esdh_form_os2web_settings_settings_form_alter(&$form, &$f
   // MM configuration.
   $form['meetings'] = array(
     '#type' => 'fieldset',
-    '#title' => 'Referat import',
-    '#description' => 'Indstillinger der vedrører importen af Acadre referater og dagsordener.',
+    '#title' => t('Meeting Management Import'),
+    '#description' => t('Settings related to Acadre MM import of minutes and agendas.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
   $form['meetings']['os2web_meetings_path'] = array(
     '#type' => 'textfield',
-    '#title' => 'Sti til acadre publish folder.',
-    '#description' => 'Dette er stien hvor Acadre publisere .XML filer til.',
+    '#title' => t('Path to Acadre MM publish folder.'),
+    '#description' => t('The path where Acadre MM publish .XML files.'),
     '#default_value' => variable_get('os2web_meetings_path', ACADRE_MM_IMPORT_DIR),
   );
   $form['meetings']['os2web_meetings_approved_committee'] = array(
     '#type' => 'textfield',
-    '#title' => 'Godkendte Udvalg',
+    '#title' => t('Approved committees'),
     '#maxlength' => 200,
-    '#description' => 'Komma sepereret liste over udvalgs-id der er godkendt til publisering.',
+    '#description' => t('Comma separated list of committees approved for publishing.'),
     '#default_value' => variable_get('os2web_meetings_approved_committee', ACADRE_MM_DEFAULT_APPROVED),
   );
   $form['meetings']['os2web_meetings_import_closed_agenda'] = array(
@@ -53,11 +53,20 @@ function os2web_acadre_esdh_form_os2web_settings_settings_form_alter(&$form, &$f
     '#description'=>t('This decides if closed agenda is or is not to be imported'),
     '#default_value' => variable_get('os2web_meetings_import_closed_agenda', false),
   );
-
+  
+  $form['meetings']['os2web_meetings_import_service_ip'] = array(
+    '#type' => 'textfield',
+    '#title' => t('IP addresses allowed to trigger import'),
+    '#description' => t('IP addresses separated by comma which can access <em>admin/os2web/import/<ID></em>.'),
+    '#default_value' => variable_get('os2web_meetings_import_service_ip', ip_address()),
+  );
+  
   // CM Configuration.
   $form['os2web_pws_config_group'] = array(
     '#type' => 'fieldset',
-    '#title' => t('PWS Endpoint configuration'),
+    '#title' => t('Case Management Import'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
   );
   $form['os2web_pws_config_group']['os2web_pws_url'] = array(
     '#type' => 'textfield',
@@ -89,6 +98,13 @@ function os2web_acadre_esdh_form_os2web_settings_settings_form_alter(&$form, &$f
     '#title' => t('PWS password'),
     '#description' => t('PWS HTTP authentification password.'),
   );
+  
+  // Enable external queue import.
+  $form['os2web_esdh_provider']['os2web_esdh_provider_queue_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable external queue import'),
+    '#default_value' => variable_get('os2web_esdh_provider_queue_enabled', FALSE),
+  );
 
   // Proxy setups
   $form['os2web_pws_proxy_group'] = array(
@@ -119,7 +135,7 @@ function os2web_acadre_esdh_form_os2web_settings_settings_form_alter(&$form, &$f
   );
   $form['os2web_pws_adlib_group']['os2web_adlib_url'] = array(
     '#type' => 'textfield',
-    '#default_value' => variable_get('os2web_adlib_url', 'http://706CAR01/ExponentWSA/ExponentWSA.asmx?wsdl'),
+    '#default_value' => variable_get('os2web_adlib_url', 'http://SERVER/ExponentWSA/ExponentWSA.asmx?wsdl'),
     '#title' => t('URL for Adlib service endpoint'),
     '#description' => t('URL to the webservice endpoint that runs the Adlib service.'),
   );

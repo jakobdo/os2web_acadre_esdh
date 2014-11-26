@@ -43,8 +43,8 @@ function acadreos2web__esdh_drush_command() {
     'arguments' => array(),
     'aliases' => array('esdh-st'),
   );
-  $items['acadre-addenum-fix'] = array(
-    'description' => 'Reorders addenums',
+  $items['acadre-addendum-fix'] = array(
+    'description' => 'Reorders addendums',
     'arguments' => array(),
     'aliases' => array('esdh-af'),
   );
@@ -151,7 +151,7 @@ function drush_os2web_acadre_esdh_acadre_cm_status() {
 /**
  * Implements drush_COMMAND().
  */
-function drush_os2web_acadre_esdh_acadre_addenum_fix() {
+function drush_os2web_acadre_esdh_acadre_addendum_fix() {
   if (os2web_esdh_provider_has_api('mm')) {
     if (os2web_esdh_provider_supports('mm', 'post_import_process')) {
       os2web_esdh_provider_invoke('mm', 'post_import_process');
