@@ -419,8 +419,8 @@ function _os2web_acadre_esdh_mm_order_addenums($drush = FALSE) {
   $debug && error_log('MM Import - Update addendums on ' . count($meetings) . ' nodes - ' . timer_read('_os2web_acadre_esdh_mm_order_addenums') . 'ms - ' . memory_get_usage());
   // Run through the meeting array, to determine the addendums.
   foreach ($meetings as $m_id => $meeting) {
-    // Lowest system id first.
-    ksort($meeting);
+    // Lowest node id first.
+    asort($meeting);
     if (in_array($m_id, $rev_meetings)) {
       $meeting = array_reverse($meeting);
     }
