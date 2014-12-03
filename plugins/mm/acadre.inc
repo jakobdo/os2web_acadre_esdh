@@ -21,7 +21,7 @@ $plugin = array(
   'test' => 'os2web_acadre_esdh_mm_test',
   'get_import_list' => 'os2web_acadre_esdh_mm_get_import_list',
   'import_meeting' => 'os2web_acadre_esdh_mm_import_meeting',
-  'post_import_process' => '_os2web_acadre_esdh_mm_order_addenums',
+  'post_import_process' => '_os2web_acadre_esdh_mm_order_addendums',
 );
 
 /**
@@ -84,7 +84,7 @@ function os2web_acadre_esdh_mm_import_meeting($meeting) {
 
   $file = $meeting['uri'];
   if ($file === FALSE) {
-    os2web_meetings_order_addenums();
+    os2web_meetings_order_addendums();
   }
   $meetings = array();
   if (is_file(drupal_realpath($file))) {
@@ -357,17 +357,17 @@ function _os2web_acadre_esdh_similar_file_exists($filename) {
 }
 
 /**
- * This function will set up the addenum connections for meetings.
+ * This function will set up the addendum connections for meetings.
  * @TODO: Rid this of drupal specific code.
  */
-function _os2web_acadre_esdh_mm_order_addenums($drush = FALSE) {
+function _os2web_acadre_esdh_mm_order_addendums($drush = FALSE) {
   if (!lock_acquire(__FUNCTION__)) {
     return;
   }
 
   // Debug bit set in os2web_esdh_provider settings.
   $debug = variable_get('os2web_esdh_provider_debug_info');
-  $debug && timer_start('_os2web_acadre_esdh_mm_order_addenums') && error_log('MM Import - Start of addendums - ' . timer_read('_os2web_acadre_esdh_mm_order_addenums') . 'ms - ' . memory_get_usage());
+  $debug && timer_start('_os2web_acadre_esdh_mm_order_addendums') && error_log('MM Import - Start of addendums - ' . timer_read('_os2web_acadre_esdh_mm_order_addendums') . 'ms - ' . memory_get_usage());
 
   $rev_meetings = array();
 
@@ -394,11 +394,11 @@ function _os2web_acadre_esdh_mm_order_addenums($drush = FALSE) {
 
   $nids_with_addendums = array();
 
-  $debug && error_log('MM Import - Retrieve nodes with addendums from ' . count($nodes) . ' nodes - ' . timer_read('_os2web_acadre_esdh_mm_order_addenums') . 'ms - ' . memory_get_usage());
+  $debug && error_log('MM Import - Retrieve nodes with addendums from ' . count($nodes) . ' nodes - ' . timer_read('_os2web_acadre_esdh_mm_order_addendums') . 'ms - ' . memory_get_usage());
   // Loop through all meeting nodes, and generate an array with meeting grouped.
   foreach ($nodes as $node) {
-    $addenum_to = field_get_items('node', $node, 'field_os2web_meetings_addendum');
-    if (isset($addenum_to[0]['nid']) && is_numeric($addenum_to[0]['nid'])) {
+    $addendum_to = field_get_items('node', $node, 'field_os2web_meetings_addendum');
+    if (isset($addendum_to[0]['nid']) && is_numeric($addendum_to[0]['nid'])) {
       $nids_with_addendums[$node->nid] = $node->nid;
     }
     $meeting_id = field_get_items('node', $node, 'field_os2web_meetings_id');
@@ -418,7 +418,7 @@ function _os2web_acadre_esdh_mm_order_addenums($drush = FALSE) {
     }
   }
 
-  $debug && error_log('MM Import - Update addendums on ' . count($meetings) . ' nodes - ' . timer_read('_os2web_acadre_esdh_mm_order_addenums') . 'ms - ' . memory_get_usage());
+  $debug && error_log('MM Import - Update addendums on ' . count($meetings) . ' nodes - ' . timer_read('_os2web_acadre_esdh_mm_order_addendums') . 'ms - ' . memory_get_usage());
   // Run through the meeting array, to determine the addendums.
   foreach ($meetings as $m_id => $meeting) {
     // Lowest system id first.
@@ -428,21 +428,21 @@ function _os2web_acadre_esdh_mm_order_addenums($drush = FALSE) {
     }
     // Lowest system id is primary.
     $primary = $nodes[array_shift($meeting)];
-    $addenum_to = field_get_items('node', $primary, 'field_os2web_meetings_addendum');
-    if (!empty($addenum_to[0]['nid'])) {
+    $addendum_to = field_get_items('node', $primary, 'field_os2web_meetings_addendum');
+    if (!empty($addendum_to[0]['nid'])) {
       $primary->field_os2web_meetings_addendum[LANGUAGE_NONE] = array();
       node_save($primary);
     }
     while ($next = array_shift($meeting)) {
-      // Set up references for addenum agendas.
+      // Set up references for addendum agendas.
       $node = $nodes[$next];
       if ($primary) {
-        $addenum_to = field_get_items('node', $node, 'field_os2web_meetings_addendum');
-        $addenum_to = is_array($addenum_to) ? array_shift(array_shift($addenum_to)) : FALSE;
+        $addendum_to = field_get_items('node', $node, 'field_os2web_meetings_addendum');
+        $addendum_to = is_array($addendum_to) ? array_shift(array_shift($addendum_to)) : FALSE;
         // Save time by only updating what is needed.
-        if ($addenum_to != $primary->nid) {
+        if ($addendum_to != $primary->nid) {
           // error_log(basename(__FILE__) . ':' . __LINE__ . ' Var: $primary = ' . print_r($primary->nid, 1));
-          // error_log(basename(__FILE__) . ':' . __LINE__ . ' Var: $addenum_to = ' . print_r($addenum_to, 1));
+          // error_log(basename(__FILE__) . ':' . __LINE__ . ' Var: $addendum_to = ' . print_r($addendum_to, 1));
           $node->field_os2web_meetings_addendum[LANGUAGE_NONE][0]['nid'] = $primary->nid;
           node_save($node);
           $node_to_access = node_load($node->nid);
@@ -461,13 +461,13 @@ function _os2web_acadre_esdh_mm_order_addenums($drush = FALSE) {
           drush_log("Updated meeting $m_id..", 'ok');
         }
         else {
-          drush_log("Removed stale addenum $m_id..", 'ok');
+          drush_log("Removed stale addendum $m_id..", 'ok');
         }
       }
     }
   }
 
-  $debug && error_log('MM Import - Start reset addendums on ' . count($nids_with_addendums) . ' nodes - ' . timer_read('_os2web_acadre_esdh_mm_order_addenums') . 'ms - ' . memory_get_usage());
+  $debug && error_log('MM Import - Start reset addendums on ' . count($nids_with_addendums) . ' nodes - ' . timer_read('_os2web_acadre_esdh_mm_order_addendums') . 'ms - ' . memory_get_usage());
   // Remove any addendums from nodes which hasnt been proccessed.
   foreach ($nids_with_addendums as $nid) {
     // Load the node from the local variable.
@@ -478,6 +478,6 @@ function _os2web_acadre_esdh_mm_order_addenums($drush = FALSE) {
       drush_log("Resetting $nid..", 'ok');
     }
   }
-  $debug && error_log('MM Import - End of addendums - ' . timer_read('_os2web_acadre_esdh_mm_order_addenums') . 'ms - ' . memory_get_usage());
+  $debug && error_log('MM Import - End of addendums - ' . timer_read('_os2web_acadre_esdh_mm_order_addendums') . 'ms - ' . memory_get_usage());
   lock_release(__FUNCTION__);
 }
