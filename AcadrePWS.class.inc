@@ -289,13 +289,28 @@ class AcadrePWS {
         }
       }
     }
+
     if (is_string($result)) {
-      $result = simplexml_load_string($result)->xpath('//soap:Body[1]/*/*');
+      $result = simplexml_load_string($result);
+      if(is_object($result)) {
+        return $result->xpath('//soap:Body[1]/*/*');
+      }
+      else {
+        // Something is wrong, we are trying to use a string which is not XML.
+        // This could be because of some error in Acadre.
+        $err_message = t('A malformed XML document was recieved from Acadre, doing an GetAllDocuments call.');
+        foreach(libxml_get_errors() as $error) {
+          $err_message .= "\n" . $error;
+        }
+        // Use the mail sender in OS2web Settings to let an admin know.
+        if (function_exists('_os2web_settings_send_error_email')) {
+          // Dont spam too much. Only send the error every 30 minutes.
+          _os2web_settings_send_error_email($err_message, 30);
+        }
+        throw new Exception($err_message);
+      }
     }
-    else {
-      return FALSE;
-    }
-    return $result;
+    return FALSE;
   }
 
   /**
@@ -401,6 +416,35 @@ class AcadrePWS {
       }
       catch (SoapFault $sf) {
         $result = FALSE;
+      }
+    }
+    return $result;
+  }
+
+    /**
+   * Gets all meta for every document we send the IDs of.
+   *
+   * @param array $documents
+   *   Document IDs
+   *
+   * @return array
+   *   Documents meta
+   */
+  public function getDocuments($documents) {
+    $cid = __FUNCTION__ . $query;
+    $result = &drupal_static($cid, FALSE);
+    if ($result != FALSE) {
+      return $result;
+    }
+    elseif ($this->getClientSearch()) {
+      if (!is_array($documents)) {
+        $documents = array( $documents );
+      }
+      try {
+        $result = $this->clientSearch->GetDocuments(array('DocumentIDs' => $documents))->GetDocumentsResult;
+      }
+      catch (SoapFault $sf) {
+        $result = $sf;
       }
     }
     return $result;
