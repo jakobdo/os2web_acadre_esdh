@@ -24,7 +24,8 @@ class AcadrePWS {
     curl_exec($handle);
     $http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
     curl_close($handle);
-    // Since this is just a heuristic, we allow access denied (401) for further check.
+    // Since this is just a heuristic, we allow access denied (401)
+    // for further check.
     return in_array($http_code, array(200, 401));
   }
 
@@ -292,14 +293,14 @@ class AcadrePWS {
 
     if (is_string($result)) {
       $result = simplexml_load_string($result);
-      if(is_object($result)) {
+      if (is_object($result)) {
         return $result->xpath('//soap:Body[1]/*/*');
       }
       else {
         // Something is wrong, we are trying to use a string which is not XML.
         // This could be because of some error in Acadre.
         $err_message = t('A malformed XML document was recieved from Acadre, doing an GetAllDocuments call.');
-        foreach(libxml_get_errors() as $error) {
+        foreach (libxml_get_errors() as $error) {
           $err_message .= "\n" . $error;
         }
         // Use the mail sender in OS2web Settings to let an admin know.
@@ -339,7 +340,7 @@ class AcadrePWS {
   </soap:Body>
 </soap:Envelope>';
       try {
-        $result = $this->client->__doRequest(t($request, array('[DocID]' => $id)), $this->client->location, $this->client->uri . 'GetLockStatus', SOAP_1_1);
+        $result = $this->client->__doRequest(format_string($request, array('[DocID]' => $id)), $this->client->location, $this->client->uri . 'GetLockStatus', SOAP_1_1);
         $result = simplexml_load_string($result);
         if (is_object($result)) {
           if ('' !== (string) array_pop($result->xpath('//soap:Fault/faultcode'))) {
@@ -421,7 +422,7 @@ class AcadrePWS {
     return $result;
   }
 
-    /**
+  /**
    * Gets all meta for every document we send the IDs of.
    *
    * @param array $documents
@@ -438,7 +439,7 @@ class AcadrePWS {
     }
     elseif ($this->getClientSearch()) {
       if (!is_array($documents)) {
-        $documents = array( $documents );
+        $documents = array($documents);
       }
       try {
         $result = $this->clientSearch->GetDocuments(array('DocumentIDs' => $documents))->GetDocumentsResult;
@@ -505,7 +506,7 @@ class AcadrePWS {
   </soap:Body>
 </soap:Envelope>';
       try {
-        $result = $this->client->__doRequest(t($request, array('@FileRef' => $ref, '@Version' => $ver)), $this->client->location, $this->client->uri . 'GetFileName', SOAP_1_1);
+        $result = $this->client->__doRequest(format_string($request, array('@FileRef' => $ref, '@Version' => $ver)), $this->client->location, $this->client->uri . 'GetFileName', SOAP_1_1);
         if (is_object($result = simplexml_load_string($result))) {
           $result = (string) array_shift($result->xpath('//soap:Body'))->FileName1;
           // Use md5sum to avoid long  and guessable filenames.
@@ -545,7 +546,6 @@ class AcadrePWS {
     // Cache files unless there is a newer version available.
     $fid = os2web_adlib_api_get_fid($ref);
     if ($fid > 0 && ($result = file_load($fid)) && is_file(drupal_realpath($result->uri))) {
-      // error_log(basename(__FILE__) . ':' . __LINE__ . " jm@bellcom.dk: File cached.");
       $ctime = filectime(drupal_realpath($result->uri));
       $info = $this->getDocInfo($id);
       if (is_object($info)) {
@@ -575,7 +575,7 @@ class AcadrePWS {
   </soap:Body>
 </soap:Envelope>';
       try {
-        $result = $this->client->__doRequest(t($request, array('@FileRef' => $ref, '@Version' => $ver)), $this->client->location, $this->client->uri . 'GetPhysicalDocument', SOAP_1_1);
+        $result = $this->client->__doRequest(format_string($request, array('@FileRef' => $ref, '@Version' => $ver)), $this->client->location, $this->client->uri . 'GetPhysicalDocument', SOAP_1_1);
         if (is_object($result = simplexml_load_string($result))) {
           $result = (string) array_shift($result->xpath('//soap:Body'))->XMLBinary;
           if (file_prepare_directory($dest, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
@@ -649,7 +649,7 @@ class AcadrePWS {
   </soap:Body>
 </soap:Envelope>';
       try {
-        $result = $this->client->__doRequest(t($request, array('@FileRef' => $ref, '@Version' => $ver)), $this->client->location, $this->client->uri . 'GetPhysicalDocument', SOAP_1_1);
+        $result = $this->client->__doRequest(format_string($request, array('@FileRef' => $ref, '@Version' => $ver)), $this->client->location, $this->client->uri . 'GetPhysicalDocument', SOAP_1_1);
         $result = (string) array_shift(simplexml_load_string($result)->xpath('//soap:Body'))->XMLBinary;
         cache_set($cid, $result, 'cache_os2web_pws', time() + PWS_CACHE_TIMEOUT);
       }
